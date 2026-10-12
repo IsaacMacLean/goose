@@ -11,6 +11,16 @@ if [[ "${GOOSE_SKIP_RUST_CORE_BUILD:-0}" == "1" ]]; then
   exit 0
 fi
 
+# Xcode launched from Finder does not inherit the PATH set by the user's shell.
+# rustup installs cargo in ~/.cargo/bin by default.
+if [[ -d "${HOME:-}/.cargo/bin" ]]; then
+  export PATH="$HOME/.cargo/bin:$PATH"
+fi
+if ! command -v cargo >/dev/null 2>&1; then
+  echo "Cargo not found. Install Rust with rustup and make sure ~/.cargo/bin/cargo exists." >&2
+  exit 1
+fi
+
 CONFIGURATION="${CONFIGURATION:-Debug}"
 PLATFORM_NAME="${PLATFORM_NAME:-iphonesimulator}"
 CURRENT_ARCH="${CURRENT_ARCH:-${ARCHS:-arm64}}"
